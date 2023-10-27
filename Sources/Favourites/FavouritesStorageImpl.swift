@@ -1,8 +1,8 @@
 import Foundation
 
 public class FavouritesStorageImpl: FavouritesStorage {
-    private var favourited = Set<String>()
-    private let localStorageSaveKey = "FavouritedItems"
+    @Published public var favourited = Set<String>()
+    private let localStorageSaveKey = "LocalStorageSaveKey"
     
     public init() {
         if let favourites = UserDefaults.standard.object(forKey: localStorageSaveKey) as? [String] {
@@ -11,11 +11,15 @@ public class FavouritesStorageImpl: FavouritesStorage {
     }
     
     public func isFavourite(_ item: Favourited) -> Bool {
-        favourited.contains(item.id)
+        favourited.contains(item.favouritableID)
+    }
+    
+    public func isFavourite(_ id: String) -> Bool {
+        favourited.contains(id)
     }
     
     public func toogleFavourite(_ item: Favourited) {
-        let id = item.id
+        let id = item.favouritableID
         if favourited.first(where: { $0 == id }) != nil {
             favourited.remove(id)
         } else {
@@ -26,7 +30,7 @@ public class FavouritesStorageImpl: FavouritesStorage {
     }
     
     private func saveData() {
-        let favourites = favourited.map { $0 }
+        let favourites = favourited.map { "\($0)" }
         UserDefaults.standard.set(favourites, forKey: localStorageSaveKey)
     }
     
